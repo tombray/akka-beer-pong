@@ -6,5 +6,5 @@ import BeerPongProtocol._
  */
 trait HitOrMiss {
   private val rnd = new scala.util.Random
-  def hitOrMiss(cups: Int): BeerPongMsg = if (rnd.nextInt(15 - cups) == 0) Hit else Miss
+  def hitOrMiss(cups: Int, totalBeersConsumed: Int): BeerPongMsg = if (rnd.nextInt(totalBeersConsumed + 15 - cups) == 0) Hit else Miss
 }

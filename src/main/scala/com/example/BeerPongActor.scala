@@ -1,9 +1,8 @@
 package com.example
 
 import akka.actor.{Props, Actor, ActorLogging}
-import akka.event.LoggingReceive
 import com.example.BeerPongProtocol._
-import com.example.PingPongProtocol.Join
+import scala.concurrent.duration._
 
 /**
  * Created by tombray on 5/11/15.
@@ -14,35 +13,47 @@ object BeerPongActor {
 
 class BeerPongActor extends Actor with ActorLogging with HitOrMiss {
 
-  def receive: Receive = idle
+  implicit val ec = context.dispatcher
 
-  def idle: Receive = {
-    case Start => context.become(playing(10))
+  def receive: Receive = idle(0)
+
+  def idle(totalBeersConsumed: Int): Receive = {
+    case Start =>
+      log.info(s"totalBeersConsumed: ${totalBeersConsumed}")
+      context.become(playing(10)(totalBeersConsumed))
   }
 
-  def playing( cups: Int ): Receive = {
-    case Serve(opponent) => opponent ! hitOrMiss(cups)
-    case Hit => drink(cups)
+  def playing( cups: Int )(implicit totalBeersConsumed: Int): Receive = {
+
+    case Serve(opponent) => opponent ! hitOrMiss(cups, totalBeersConsumed)
+
+    case Hit =>
+      log.info(s"drink! ${cups}")
+      cups match {
+        case 1 =>
+          sender() ! YouWin
+          becomeIdle(cups - 1)
+        case _ => sendHitOrMiss(cups - 1)
+      }
+
     case Miss => sendHitOrMiss(cups)
+
     case YouWin =>
       log.info("Woohoo! I win")
-      context.become(idle)
+      becomeIdle(cups)
   }
 
-  private def drink( cups: Int) = {
-    log.info(s"drink(${cups})")
-    cups match {
-      case 1 =>
-        sender() ! YouWin
-        context.become(idle)
-      case _ => sendHitOrMiss(cups - 1)
-    }
-  }
-
-  private def sendHitOrMiss( cups: Int ) = {
+  private def sendHitOrMiss( cups: Int )(implicit totalBeersConsumed: Int) = {
     log.info(s"sendHitOrMiss(${cups})")
-    sender() ! hitOrMiss(cups)
+    delayedReply( hitOrMiss(cups, totalBeersConsumed) )
     context.become(playing(cups))
   }
 
+  private def becomeIdle(cupsRemaining: Int)( implicit totalBeersConsumed: Int) = {
+    context.become(idle(totalBeersConsumed + (10 - cupsRemaining)))
+  }
+
+  private def delayedReply(msg: Any) = {
+    context.system.scheduler.scheduleOnce(1 second, sender(), msg)
+  }
 }
