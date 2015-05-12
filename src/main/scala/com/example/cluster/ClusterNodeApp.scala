@@ -18,9 +18,12 @@ object ClusterNodeApp extends App {
 
   val hostname = args(0)
   val port = args(1).toInt
+  val baseConfig = ConfigFactory.load()
+  val clusterConfig = baseConfig.getConfig("clusterApp").withFallback(baseConfig)
+
   val config =
     ConfigFactory.parseString(conf.replaceAll("%hostname%", hostname)
-      .replaceAll("%port%", port.toString)).withFallback(ConfigFactory.load())
+      .replaceAll("%port%", port.toString)).withFallback(clusterConfig)
 
   // Create an Akka system
   implicit val clusterSystem = ActorSystem("PingPong", config)

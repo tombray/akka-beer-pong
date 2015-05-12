@@ -36,6 +36,12 @@ class PingPongActorSpec(_system: ActorSystem) extends TestKit(_system) with Impl
     }
   }
 
+  "A Beer Pong actor" must {
+    "send hit or miss" in {
+
+    }
+  }
+
   "A Match actor" must {
     "send a RequestForPlayers" in {
       val mediatorProbe = TestProbe()
