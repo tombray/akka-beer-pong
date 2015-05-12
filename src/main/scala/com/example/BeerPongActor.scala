@@ -14,6 +14,7 @@ object BeerPongActor {
 
 class BeerPongActor extends Actor with ActorLogging with HitOrMiss with DelayedReply {
 
+
   def receive: Receive = idle(PlayerState(0))
 
   def idle(state: PlayerState): Receive = {

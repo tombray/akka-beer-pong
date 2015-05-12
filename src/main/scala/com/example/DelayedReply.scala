@@ -12,7 +12,7 @@ trait DelayedReply {
   implicit val ec = context.dispatcher
 
   def delayedReply(msg: Any) = {
-    context.system.scheduler.scheduleOnce(1 second, sender(), msg)
+    context.system.scheduler.scheduleOnce(250 milliseconds, sender(), msg)
   }
 
 }

@@ -1,6 +1,7 @@
 package com.example
 
 import akka.actor.{Props, Actor, ActorLogging}
+import akka.contrib.pattern.ReliableProxy.Idle
 import akka.persistence.PersistentActor
 import com.example.BeerPongProtocol._
 import BeerPongActor._
@@ -14,6 +15,8 @@ object PersistentBeerPongActor {
 }
 
 class PersistentBeerPongActor extends PersistentActor with ActorLogging with HitOrMiss with DelayedReply {
+
+  import PlayerState._
 
   def receiveCommand: Receive = idle(PlayerState(0))
 
