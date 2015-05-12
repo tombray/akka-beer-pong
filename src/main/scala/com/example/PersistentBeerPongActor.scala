@@ -1,6 +1,7 @@
 package com.example
 
 import akka.actor.{Props, Actor, ActorLogging}
+import akka.persistence.PersistentActor
 import com.example.BeerPongProtocol._
 import BeerPongActor._
 import com.example.DomainModel.PlayerState
@@ -8,13 +9,13 @@ import com.example.DomainModel.PlayerState
 /**
  * Created by tombray on 5/11/15.
  */
-object BeerPongActor {
-  def props() = Props(new BeerPongActor)
+object PersistentBeerPongActor {
+  def props() = Props(new PersistentBeerPongActor)
 }
 
-class BeerPongActor extends Actor with ActorLogging with HitOrMiss with DelayedReply {
+class PersistentBeerPongActor extends PersistentActor with ActorLogging with HitOrMiss with DelayedReply {
 
-  def receive: Receive = idle(PlayerState(0))
+  def receiveCommand: Receive = idle(PlayerState(0))
 
   def idle(state: PlayerState): Receive = {
     case Start =>
@@ -53,4 +54,10 @@ class BeerPongActor extends Actor with ActorLogging with HitOrMiss with DelayedR
   }
 
   private def oneLessCup(implicit state: PlayerState) = state.copy(cupsRemaining = state.cupsRemaining - 1)
+
+  override def receiveRecover: Receive = {
+    case _ =>
+  }
+
+  override def persistenceId: String = "PersistentBeerPongActor-" + self.path.name
 }

@@ -4,8 +4,6 @@ import akka.actor.ActorSystem
 import akka.actor.Actor
 import akka.actor.Props
 import akka.testkit.{TestProbe, TestActors, TestKit, ImplicitSender}
-import com.example.MatchActor.Score
-import com.example.PingPongProtocol._
 import org.scalatest.WordSpecLike
 import org.scalatest.Matchers
 import org.scalatest.BeforeAndAfterAll

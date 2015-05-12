@@ -1,7 +1,7 @@
 package com.example
 
 import BeerPongProtocol._
-import com.example.BeerPongActor.PlayerState
+import com.example.DomainModel.PlayerState
 
 /**
  * Created by tombray on 5/11/15.
